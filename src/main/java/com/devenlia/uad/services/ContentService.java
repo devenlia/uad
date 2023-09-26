@@ -8,6 +8,8 @@ import com.devenlia.uad.repositories.PageRepository;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class ContentService {
 
@@ -48,6 +50,9 @@ public class ContentService {
             }
         }
 
+        if (parent.getSubpages().stream().anyMatch(sp -> sp.getName().equals(page.getName())))
+            throw new IllegalArgumentException("Pagename already taken");
+
         page.getContainers().forEach(container -> {
             container.getCategories().forEach(category -> {
                 linkRepository.saveAll(category.getLinks());
@@ -66,6 +71,38 @@ public class ContentService {
 
     public Page getPage(String id) {
         return pageRepository.findById(id).orElse(null);
+    }
+
+    public Page searchPage(String path) {
+        if (path.startsWith("/"))
+            path = path.substring(1);
+        if (path.startsWith("home/"))
+            path = path.substring(5);
+        // split path into individual page names
+        String[] pageNames = path.split("/");
+
+        // begin with the page with id 0
+        Page currentPage = getPage("0");
+        if (currentPage == null)
+            throw new IllegalArgumentException("Home page not found");
+
+        // iterate over page names
+        for (String pageName : pageNames) {
+            // check if the currentPage has a subpage with the current name
+            Optional<SubPage> subPage = currentPage.getSubpages().stream()
+                    .filter(sp -> sp.getName().equalsIgnoreCase(pageName))
+                    .findFirst();
+
+            // if the subpage was not found, throw an exception
+            if (subPage.isEmpty()) {
+                throw new IllegalArgumentException(String.format("Subpage '%s' not found.", pageName));
+            }
+
+            // if the subpage was found, update currentPage to point to it
+            currentPage = getPage(subPage.get().getId());
+        }
+
+        return currentPage;
     }
 
     public Container addContainer(String parentId, Container container) {

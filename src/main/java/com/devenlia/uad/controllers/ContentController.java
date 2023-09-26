@@ -1,10 +1,7 @@
 package com.devenlia.uad.controllers;
 
 import com.devenlia.uad.models.*;
-import com.devenlia.uad.models.requests.ReqCategory;
-import com.devenlia.uad.models.requests.ReqContainer;
-import com.devenlia.uad.models.requests.ReqLink;
-import com.devenlia.uad.models.requests.ReqPage;
+import com.devenlia.uad.models.requests.*;
 import com.devenlia.uad.services.ContentService;
 import jakarta.annotation.Resource;
 import org.springframework.http.HttpStatus;
@@ -29,6 +26,17 @@ public class ContentController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/searchPage")
+    public ResponseEntity<?> searchPage(@RequestParam String path) {
+        Page page;
+        try {
+            page = contentService.searchPage(path);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
     @GetMapping("/getPage")
