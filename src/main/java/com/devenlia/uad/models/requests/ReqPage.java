@@ -5,6 +5,5 @@ import lombok.Data;
 
 @Data
 public class ReqPage {
-    private String parent;
     private Page page;
 }
