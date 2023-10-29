@@ -23,7 +23,7 @@ public class ContainerController {
         Container savedContainer;
 
         try {
-            savedContainer = containerService.addContainer(reqContainer.getParent(), reqContainer.getContainer());
+            savedContainer = containerService.add(reqContainer.getParent(), reqContainer.getContainer());
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
