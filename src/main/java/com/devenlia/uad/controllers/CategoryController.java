@@ -23,7 +23,7 @@ public class CategoryController {
         Category savedCategory;
 
         try {
-            savedCategory = categoryService.addCategory(reqCategory.getParent(), reqCategory.getCategory());
+            savedCategory = categoryService.add(reqCategory.getParent(), reqCategory.getCategory());
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
