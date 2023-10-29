@@ -23,7 +23,7 @@ public class LinkController {
         Link savedLink;
 
         try {
-            savedLink = linkService.addLink(reqLink.getParent(), reqLink.getLink());
+            savedLink = linkService.add(reqLink.getParent(), reqLink.getLink());
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
