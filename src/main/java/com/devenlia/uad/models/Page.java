@@ -22,6 +22,15 @@ public class Page {
     @DBRef
     private List<Container> containers = new ArrayList<>();
 
+    public Page() {}
+
+    public Page(String id, String name, String path) {
+        this.id = id;
+        this.name = name;
+        this.path = path;
+    }
+
+
     @JsonIgnore
     public boolean isValid() {
         return this.name != null && !this.name.isEmpty() && containers.stream().allMatch(Container::isValid);

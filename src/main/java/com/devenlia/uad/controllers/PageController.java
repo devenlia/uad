@@ -22,6 +22,9 @@ public class PageController {
         Page page;
         try {
             page = pageService.search(path);
+            if (page == null) {
+                return new ResponseEntity<>("Page Not Found", HttpStatus.NOT_FOUND);
+            }
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -44,6 +47,11 @@ public class PageController {
             return new ResponseEntity<>("Page Not Found", HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(page, HttpStatus.OK);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<?> listPages() {
+        return new ResponseEntity<>(pageService.listAll(), HttpStatus.OK);
     }
 
     @PostMapping("/add")
@@ -77,11 +85,12 @@ public class PageController {
         if (id.equals("0")) {
             return new ResponseEntity<>("Homepage cannot be deleted!", HttpStatus.FORBIDDEN);
         }
-        Page page = pageService.get(id);
-        if (page == null) {
-            return new ResponseEntity<>("Page Not Found", HttpStatus.NOT_FOUND);
+        try {
+            pageService.delete(id);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        pageService.delete(page);
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

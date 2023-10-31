@@ -1,11 +1,13 @@
 package com.devenlia.uad.services;
 
+import com.devenlia.uad.models.Container;
 import com.devenlia.uad.models.Page;
 import com.devenlia.uad.models.SubPage;
 import com.devenlia.uad.repositories.PageRepository;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -66,20 +68,52 @@ public class PageService {
         }
 
         if (search(page.getPath()) != null) {
-            System.out.println(search(page.getPath()));
             throw new IllegalArgumentException("Page name already taken");
         }
 
-        page.getContainers().forEach(container -> {
-            containerService.add(page.getId(), container);
-        });
+        List<SubPage> subPages = page.getSubpages();
+        page.setSubpages(new ArrayList<>());
 
-        Page newPage = pageRepository.save(page);
+        List<Container> containers = page.getContainers();
+        page.setContainers(new ArrayList<>());
 
-        parent.getSubpages().add(new SubPage(newPage.getName(), newPage.getId()));
+        Page savedPage = pageRepository.save(page);
+
+        if (subPages != null && !subPages.isEmpty()) {
+            List<SubPage> newSubPages = new ArrayList<>();
+            subPages.forEach(subPage -> {
+                Page subpage = get(subPage.getId());
+                if (subpage != null) {
+                    String path = savedPage.getPath() + "." + subPage.getName().toLowerCase()
+                            .replace("\u00fc", "ue")
+                            .replace("\u00f6", "oe")
+                            .replace("\u00e4", "ae")
+                            .replace("\u00df", "ss");
+                    subpage.setPath(path);
+                    subpage.setId(null);
+
+                    Page newSubpage = add(subpage);
+
+                    newSubPages.add(new SubPage(newSubpage.getName(), newSubpage.getId(), newSubpage.getPath()));
+                }
+            });
+            savedPage.setSubpages(newSubPages);
+            pageRepository.save(savedPage);
+        }
+
+        if (containers != null && !containers.isEmpty()) {
+            List<Container> newContainers = new ArrayList<>();
+            containers.forEach(container -> {
+                newContainers.add(containerService.add(savedPage.getId(), container));
+            });
+            savedPage.setContainers(newContainers);
+            pageRepository.save(savedPage);
+        }
+
+        parent.getSubpages().add(new SubPage(savedPage.getName(), savedPage.getId(), savedPage.getPath()));
         pageRepository.save(parent);
 
-        return newPage;
+        return savedPage;
     }
 
     /**
@@ -102,6 +136,16 @@ public class PageService {
         return pageRepository.findByPath(path).orElse(null);
     }
 
+    public List<SubPage> listAll() {
+        List<SubPage> all = new ArrayList<>();
+
+        for (Page page : pageRepository.findAll()) {
+            all.add(new SubPage(page.getName(), page.getId(), page.getPath()));
+        }
+
+        return all;
+    }
+
     /**
      * Updates a page in the page repository.
      *
@@ -115,13 +159,15 @@ public class PageService {
     /**
      * Deletes a page and its associated containers.
      *
-     * @param page the page to be deleted
+     * @param id the id of the page to be deleted
      */
-    public void delete(Page page) {
-        page.getContainers().forEach(container -> {
-            containerService.delete(container);
-        });
+    public void delete(String id) {
+        Page page = get(id);
+        if (page == null) {
+            throw new IllegalArgumentException("Page not found!");
+        }
 
+        // Get the parent
         Page parent;
         int lastIndex = page.getPath().lastIndexOf(".");
         if (lastIndex >= 0) {
@@ -131,8 +177,18 @@ public class PageService {
             throw new IllegalArgumentException("There is an error with the given path!");
         }
 
+        page.getSubpages().forEach(subPage -> {
+            delete(subPage.getId());
+        });
+
+        // Delete containers in this Page
+        page.getContainers().forEach(container -> {
+            containerService.delete(container);
+        });
+
+        // Removes this Page from the Parent
         List<SubPage> parentSubpages = parent.getSubpages();
-        parentSubpages.remove(new SubPage(page.getName(), page.getId()));
+        parentSubpages.remove(new SubPage(page.getName(), page.getId(), page.getPath()));
         parent.setSubpages(parentSubpages);
         update(parent);
 
