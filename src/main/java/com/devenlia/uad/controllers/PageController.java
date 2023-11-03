@@ -81,7 +81,7 @@ public class PageController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> getHomePage(@RequestParam String id) {
+    public ResponseEntity<?> deletePage(@RequestParam String id) {
         if (id.equals("0")) {
             return new ResponseEntity<>("Homepage cannot be deleted!", HttpStatus.FORBIDDEN);
         }
