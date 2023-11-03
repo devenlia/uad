@@ -104,7 +104,8 @@ public class PageService {
         if (containers != null && !containers.isEmpty()) {
             List<Container> newContainers = new ArrayList<>();
             containers.forEach(container -> {
-                newContainers.add(containerService.add(savedPage.getId(), container));
+                container.setParentId(savedPage.getId());
+                newContainers.add(containerService.add(container));
             });
             savedPage.setContainers(newContainers);
             pageRepository.save(savedPage);
@@ -183,7 +184,7 @@ public class PageService {
 
         // Delete containers in this Page
         page.getContainers().forEach(container -> {
-            containerService.delete(container);
+            containerService.delete(container.getId());
         });
 
         // Removes this Page from the Parent

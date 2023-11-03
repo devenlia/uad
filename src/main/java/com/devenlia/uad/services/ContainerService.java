@@ -2,10 +2,13 @@ package com.devenlia.uad.services;
 
 import com.devenlia.uad.models.Container;
 import com.devenlia.uad.models.Page;
+import com.devenlia.uad.models.SubPage;
 import com.devenlia.uad.repositories.ContainerRepository;
 import com.devenlia.uad.repositories.PageRepository;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ContainerService {
@@ -21,19 +24,20 @@ public class ContainerService {
     /**
      * Adds a container to the specified parent page.
      *
-     * @param parentId the ID of the parent page
      * @param container the container to be added
      * @return the newly added container
      * @throws IllegalArgumentException if the container is null, invalid, or the parent page does not exist
      */
-    public Container add(String parentId, Container container) {
+    public Container add(Container container) {
+        System.out.println(container);
+
         if (container == null || !container.isValid()) {
             throw new IllegalArgumentException("Invalid container data");
         }
 
         Page parent;
-        if (parentId != null && !parentId.isEmpty()) {
-            parent = pageRepository.findById(parentId).orElse(null);
+        if (container.getParentId() != null && !container.getParentId().isEmpty()) {
+            parent = pageRepository.findById(container.getParentId()).orElse(null);
             if (parent == null) {
                 throw new IllegalArgumentException("Parent page not found");
             }
@@ -46,6 +50,7 @@ public class ContainerService {
             categoryService.add(container.getId(), category);
         });
 
+        container.setId(null);
         Container newContainer = containerRepository.save(container);
         parent.getContainers().add(newContainer);
         pageRepository.save(parent);
@@ -73,12 +78,32 @@ public class ContainerService {
         return containerRepository.save(container);
     }
 
+
     /**
-     * Deletes a container and its associated categories and links.
+     * Deletes a container from the database.
      *
-     * @param container the container to be deleted
+     * @param id the ID of the container to be deleted
      */
-    public void delete(Container container) {
+    public void delete(String id) {
+        Container container = get(id);
+        if (container == null) {
+            throw new IllegalArgumentException("Container not found!");
+        }
+
+        Page parent;
+        if (container.getParentId() != null && !container.getParentId().isEmpty()) {
+            parent = pageRepository.findById(container.getParentId()).orElse(null);
+            if (parent == null) {
+                throw new IllegalArgumentException("Parent page not found");
+            }
+        }
+        else {
+            throw new IllegalArgumentException("Parent page not defined");
+        }
+
+        parent.getContainers().removeIf(child -> child.getId().equals(container.getId()));
+        pageRepository.save(parent);
+
         container.getCategories().forEach(category -> {
             categoryService.delete(category);
         });

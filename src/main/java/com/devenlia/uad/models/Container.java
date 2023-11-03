@@ -14,6 +14,7 @@ import java.util.List;
 public class Container {
     @Id
     private String id;
+    private String parentId;
     private String name;
     @DBRef
     private List<Category> categories = new ArrayList<>();
