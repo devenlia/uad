@@ -47,7 +47,8 @@ public class ContainerService {
         }
 
         container.getCategories().forEach(category -> {
-            categoryService.add(container.getId(), category);
+            category.setParentId(container.getId());
+            categoryService.add(category);
         });
 
         container.setId(null);
@@ -105,7 +106,7 @@ public class ContainerService {
         pageRepository.save(parent);
 
         container.getCategories().forEach(category -> {
-            categoryService.delete(category);
+            categoryService.delete(category.getId());
         });
         containerRepository.delete(container);
     }

@@ -1,7 +1,6 @@
 package com.devenlia.uad.controllers;
 
 import com.devenlia.uad.models.Page;
-import com.devenlia.uad.models.requests.ReqPage;
 import com.devenlia.uad.services.PageService;
 import jakarta.annotation.Resource;
 import org.springframework.http.HttpStatus;
@@ -55,9 +54,9 @@ public class PageController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addPage(@RequestBody ReqPage reqPage) {
+    public ResponseEntity<?> addPage(@RequestBody Page page) {
         try {
-            Page savedPage = pageService.add(reqPage.getPage());
+            Page savedPage = pageService.add(page);
             if (savedPage == null) {
                 return new ResponseEntity<>("Page cannot be saved", HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -68,9 +67,9 @@ public class PageController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updatePage(@RequestBody ReqPage reqPage) {
+    public ResponseEntity<?> updatePage(@RequestBody Page page) {
         try {
-            Page savedPage = pageService.update(reqPage.getPage());
+            Page savedPage = pageService.update(page);
             if (savedPage == null) {
                 return new ResponseEntity<>("Page cannot be updated", HttpStatus.INTERNAL_SERVER_ERROR);
             }

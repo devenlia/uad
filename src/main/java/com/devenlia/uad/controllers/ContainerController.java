@@ -1,7 +1,7 @@
 package com.devenlia.uad.controllers;
 
+import com.devenlia.uad.models.Category;
 import com.devenlia.uad.models.Container;
-import com.devenlia.uad.models.requests.ReqContainer;
 import com.devenlia.uad.services.ContainerService;
 import jakarta.annotation.Resource;
 import org.springframework.http.HttpStatus;
@@ -14,6 +14,15 @@ public class ContainerController {
 
     @Resource
     ContainerService containerService;
+
+    @GetMapping("/get")
+    public ResponseEntity<?> getContainer(@RequestParam String id) {
+        Container container = containerService.get(id);
+        if (container == null) {
+            return new ResponseEntity<>("Category Not Found", HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(container, HttpStatus.OK);
+    }
 
     @PostMapping("/add")
     public ResponseEntity<?> addContainer(@RequestBody Container container) {
