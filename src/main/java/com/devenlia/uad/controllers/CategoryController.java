@@ -1,8 +1,6 @@
 package com.devenlia.uad.controllers;
 
 import com.devenlia.uad.models.Category;
-import com.devenlia.uad.models.Page;
-import com.devenlia.uad.models.requests.ReqCategory;
 import com.devenlia.uad.services.CategoryService;
 import jakarta.annotation.Resource;
 import org.springframework.http.HttpStatus;
