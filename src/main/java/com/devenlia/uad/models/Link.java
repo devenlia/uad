@@ -10,8 +10,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Link {
     @Id
     private String id;
-    String name;
-    String href;
+    private String parentId;
+    private String name;
+    private String href;
 
     @JsonIgnore
     public boolean isValid() {

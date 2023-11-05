@@ -19,7 +19,7 @@ public class ContainerController {
     public ResponseEntity<?> getContainer(@RequestParam String id) {
         Container container = containerService.get(id);
         if (container == null) {
-            return new ResponseEntity<>("Category Not Found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Container Not Found", HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(container, HttpStatus.OK);
     }

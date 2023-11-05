@@ -44,7 +44,8 @@ public class CategoryService {
         }
 
         category.getLinks().forEach(link -> {
-            linkService.add(category.getId(), link);
+            link.setParentId(category.getId());
+            linkService.add(link);
         });
 
         Category newCategory = categoryRepository.save(category);

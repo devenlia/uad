@@ -18,12 +18,12 @@ public class LinkController {
     @Resource
     LinkService linkService;
 
-    @PostMapping("/addLink")
-    public ResponseEntity<?> addLink(@RequestBody ReqLink reqLink) {
+    @PostMapping("/add")
+    public ResponseEntity<?> addLink(@RequestBody Link link) {
         Link savedLink;
 
         try {
-            savedLink = linkService.add(reqLink.getParent(), reqLink.getLink());
+            savedLink = linkService.add(link);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

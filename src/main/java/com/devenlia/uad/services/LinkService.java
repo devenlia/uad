@@ -16,14 +16,14 @@ public class LinkService {
     @Resource
     private LinkRepository linkRepository;
 
-    public Link add(String parentId, Link link) {
+    public Link add(Link link) {
         if (link == null || !link.isValid()) {
             throw new IllegalArgumentException("Invalid link data");
         }
 
         Category parent;
-        if (parentId != null && !parentId.isEmpty()) {
-            parent = categoryRepository.findById(parentId).orElse(null);
+        if (link.getParentId() != null && !link.getParentId().isEmpty()) {
+            parent = categoryRepository.findById(link.getParentId()).orElse(null);
             if (parent == null) {
                 throw new IllegalArgumentException("Parent category not found");
             }

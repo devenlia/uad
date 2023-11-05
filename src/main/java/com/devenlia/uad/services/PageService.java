@@ -51,11 +51,7 @@ public class PageService {
                 parent = createHomePage();
             }
 
-            page.setPath(parent.getPath() + "." + page.getName().toLowerCase()
-                    .replace("\u00fc", "ue")
-                    .replace("\u00f6", "oe")
-                    .replace("\u00e4", "ae")
-                    .replace("\u00df", "ss"));
+            page.setPath(parent.getPath() + "." + page.getName());
         }
         else {
             int lastIndex = page.getPath().lastIndexOf(".");
@@ -66,6 +62,13 @@ public class PageService {
                 throw new IllegalArgumentException("There is an error with the given path!");
             }
         }
+
+        page.setPath(page.getPath().toLowerCase()
+            .replaceAll("\u00fc", "ue")
+            .replaceAll("\u00f6", "oe")
+            .replaceAll("\u00e4", "ae")
+            .replaceAll("\u00df", "ss")
+            .replaceAll("\\s", ""));
 
         if (search(page.getPath()) != null) {
             throw new IllegalArgumentException("Page name already taken");
@@ -137,14 +140,8 @@ public class PageService {
         return pageRepository.findByPath(path).orElse(null);
     }
 
-    public List<SubPage> listAll() {
-        List<SubPage> all = new ArrayList<>();
-
-        for (Page page : pageRepository.findAll()) {
-            all.add(new SubPage(page.getName(), page.getId(), page.getPath()));
-        }
-
-        return all;
+    public List<Page> listAll() {
+        return pageRepository.findAll();
     }
 
     /**
