@@ -22,7 +22,6 @@ public class CategoryService {
     /**
      * Adds a new category to the parent container.
      *
-     * @param parentId the ID of the parent container
      * @param category the category to be added
      * @return the newly added category
      * @throws IllegalArgumentException if the category is null, invalid, or the parent container does not exist
@@ -101,7 +100,7 @@ public class CategoryService {
         containerRepository.save(parent);
 
         category.getLinks().forEach(link -> {
-            linkService.delete(link);
+            linkService.delete(link.getId());
         });
         categoryRepository.delete(category);
     }
