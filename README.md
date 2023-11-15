@@ -1,3 +1,7 @@
+# UAD Server
+
+[Release notes](./RELEASE_NOTES.md)
+
 # API Documentation
 
 ## PageController
