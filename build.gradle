@@ -5,8 +5,6 @@ plugins {
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
-
-
 group = 'com.devenlia'
 version = '1.0.1'
 
