@@ -1,0 +1,19 @@
+# This file is intended for development use only, to start the required backend
+
+version: '3.5'
+services:
+  db:
+    image: mongo:latest
+    container_name: db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: uad_access
+      MONGO_INITDB_ROOT_PASSWORD: password123
+    ports:
+      - "27017:27017"
+    networks:
+      - dev
+
+networks:
+  dev:
+    name: dev
+    external: true
