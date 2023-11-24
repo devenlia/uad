@@ -1,5 +1,12 @@
 # Release Notes
 
+## Version 1.2.1
+
+### New Features and Enhancements
+- Added the possibility to use authentication when connecting to the MongoDB database.
+
+---
+
 ## Version 1.1.0
 
 ### New Features and Enhancements
