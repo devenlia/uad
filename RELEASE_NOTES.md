@@ -1,9 +1,19 @@
 # Release Notes
 
+## Version 1.2.2
+
+### New Features and Enhancements
+- Added a `sortIndex` attribute to some Components, establishing the necessary groundwork for upcoming element sorting in the frontend.
+
+---
+
 ## Version 1.2.1
 
 ### New Features and Enhancements
 - Added the possibility to use authentication when connecting to the MongoDB database.
+
+### Bug Fixes and Other Changes
+- Fixed some issues to allow the application to run successfully in Docker.
 
 ---
 
