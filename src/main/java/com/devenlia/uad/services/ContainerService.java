@@ -2,13 +2,10 @@ package com.devenlia.uad.services;
 
 import com.devenlia.uad.models.Container;
 import com.devenlia.uad.models.Page;
-import com.devenlia.uad.models.SubPage;
 import com.devenlia.uad.repositories.ContainerRepository;
 import com.devenlia.uad.repositories.PageRepository;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ContainerService {
@@ -29,8 +26,6 @@ public class ContainerService {
      * @throws IllegalArgumentException if the container is null, invalid, or the parent page does not exist
      */
     public Container add(Container container) {
-        System.out.println(container);
-
         if (container == null || !container.isValid()) {
             throw new IllegalArgumentException("Invalid container data");
         }
