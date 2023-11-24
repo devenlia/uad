@@ -8,6 +8,7 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -97,7 +98,7 @@ public class PageService {
 
                     Page newSubpage = add(subpage);
 
-                    newSubPages.add(new SubPage(newSubpage.getName(), newSubpage.getId(), newSubpage.getPath()));
+                    newSubPages.add(new SubPage(newSubpage.getId(), newSubPages.size(), newSubpage.getName(), newSubpage.getPath()));
                 }
             });
             savedPage.setSubpages(newSubPages);
@@ -114,7 +115,7 @@ public class PageService {
             pageRepository.save(savedPage);
         }
 
-        parent.getSubpages().add(new SubPage(savedPage.getName(), savedPage.getId(), savedPage.getPath()));
+        parent.getSubpages().add(new SubPage(savedPage.getId(), parent.getSubpages().size(), savedPage.getName(), savedPage.getPath()));
         pageRepository.save(parent);
 
         return savedPage;
@@ -185,9 +186,17 @@ public class PageService {
         });
 
         // Removes this Page from the Parent
-        List<SubPage> parentSubpages = parent.getSubpages();
-        parentSubpages.remove(new SubPage(page.getName(), page.getId(), page.getPath()));
-        parent.setSubpages(parentSubpages);
+        Iterator<SubPage> iterator = parent.getSubpages().iterator();
+        List<SubPage> updatedSubPages = new ArrayList<>();
+
+        while (iterator.hasNext()) {
+            SubPage subPage = iterator.next();
+            if (!subPage.getId().equals(page.getId())) {
+                updatedSubPages.add(subPage);
+            }
+        }
+
+        parent.setSubpages(updatedSubPages);
         update(parent);
 
         pageRepository.delete(page);

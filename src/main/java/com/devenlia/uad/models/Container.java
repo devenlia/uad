@@ -15,6 +15,7 @@ public class Container {
     @Id
     private String id;
     private String parentId;
+    private int sortIndex;
     private String name;
     @DBRef
     private List<Category> categories = new ArrayList<>();

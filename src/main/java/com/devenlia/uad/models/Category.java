@@ -15,6 +15,7 @@ public class Category {
     @Id
     private String id;
     private String parentId;
+    private String sortIndex;
     private String name;
     @DBRef
     private List<Link> links = new ArrayList<>();

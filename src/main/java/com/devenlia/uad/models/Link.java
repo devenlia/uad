@@ -11,6 +11,7 @@ public class Link {
     @Id
     private String id;
     private String parentId;
+    private int sortIndex;
     private String name;
     private String href;
 
