@@ -38,6 +38,19 @@ public class ContainerController {
         return new ResponseEntity<>(savedContainer, HttpStatus.OK);
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<?> updateCategory(@RequestBody Container container) {
+        try {
+            Container savedContainer = containerService.update(container);
+            if (savedContainer == null) {
+                return new ResponseEntity<>("Container cannot be updated", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            return new ResponseEntity<>(savedContainer, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteContainer(@RequestParam String id) {
         try {

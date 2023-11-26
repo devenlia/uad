@@ -59,6 +59,10 @@ public class LinkService {
         return newLink;
     }
 
+    public Link update(Link link) {
+        return linkRepository.save(link);
+    }
+
     public void delete(String id) {
         Link link = get(id);
         if (link == null) {

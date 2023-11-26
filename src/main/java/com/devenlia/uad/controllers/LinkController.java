@@ -2,6 +2,7 @@ package com.devenlia.uad.controllers;
 
 import com.devenlia.uad.models.Container;
 import com.devenlia.uad.models.Link;
+import com.devenlia.uad.models.Page;
 import com.devenlia.uad.services.LinkService;
 import jakarta.annotation.Resource;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,19 @@ public class LinkController {
 
         if (savedLink == null) return new ResponseEntity<>("Link cannot be saved", HttpStatus.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(savedLink, HttpStatus.OK);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> updateLink(@RequestBody Link link) {
+        try {
+            Link savedLink = linkService.update(link);
+            if (savedLink == null) {
+                return new ResponseEntity<>("Link cannot be updated", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            return new ResponseEntity<>(savedLink, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/delete")

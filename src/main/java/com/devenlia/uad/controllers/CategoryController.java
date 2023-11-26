@@ -1,6 +1,7 @@
 package com.devenlia.uad.controllers;
 
 import com.devenlia.uad.models.Category;
+import com.devenlia.uad.models.Link;
 import com.devenlia.uad.services.CategoryService;
 import jakarta.annotation.Resource;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,19 @@ public class CategoryController {
 
         if (savedCategory == null) return new ResponseEntity<>("Category cannot be saved", HttpStatus.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(savedCategory, HttpStatus.OK);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> updateCategory(@RequestBody Category category) {
+        try {
+            Category savedCategory = categoryService.update(category);
+            if (savedCategory == null) {
+                return new ResponseEntity<>("Category cannot be updated", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            return new ResponseEntity<>(savedCategory, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/delete")
