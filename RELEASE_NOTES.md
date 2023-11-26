@@ -1,6 +1,6 @@
 # Release Notes
 
-## Version 1.2.2
+## Version 1.2.3
 
 ### New Features and Enhancements
 - Added a `sortIndex` attribute to some Components, establishing the necessary groundwork for upcoming element sorting in the frontend.
