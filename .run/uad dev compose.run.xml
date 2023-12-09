@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="uad dev" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <option name="ACTIVE_PROFILES" value="dev, auth" />
+  <configuration default="false" name="uad dev compose" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="dev" />
     <option name="envFilePaths">
       <option value="$PROJECT_DIR$/.env" />
     </option>
@@ -21,6 +21,7 @@
       </ENTRIES>
     </extension>
     <method v="2">
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Dev Compose" run_configuration_type="docker-deploy" />
       <option name="Make" enabled="true" />
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="Load ENV-Variables" run_configuration_type="ShConfigurationType" />
     </method>

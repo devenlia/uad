@@ -6,8 +6,6 @@ services:
     image: mongo:latest
     container_name: db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: uad_access
-      MONGO_INITDB_ROOT_PASSWORD: password123
       MONGO_INITDB_DATABASE: uad
     ports:
       - "27017:27017"
