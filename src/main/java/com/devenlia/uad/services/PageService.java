@@ -64,6 +64,8 @@ public class PageService {
             }
         }
 
+        page.setParentId(parent.getId());
+
         page.setPath(page.getPath().toLowerCase()
             .replaceAll("\u00fc", "ue")
             .replaceAll("\u00f6", "oe")
@@ -98,7 +100,7 @@ public class PageService {
 
                     Page newSubpage = add(subpage);
 
-                    newSubPages.add(new SubPage(newSubpage.getId(), newSubPages.size(), newSubpage.getName(), newSubpage.getPath()));
+                    newSubPages.add(new SubPage(newSubpage.getId(), newSubpage.getName(), newSubpage.getPath()));
                 }
             });
             savedPage.setSubpages(newSubPages);
@@ -115,7 +117,7 @@ public class PageService {
             pageRepository.save(savedPage);
         }
 
-        parent.getSubpages().add(new SubPage(savedPage.getId(), parent.getSubpages().size(), savedPage.getName(), savedPage.getPath()));
+        parent.getSubpages().add(new SubPage(savedPage.getId(), savedPage.getName(), savedPage.getPath()));
         pageRepository.save(parent);
 
         return savedPage;
@@ -152,6 +154,16 @@ public class PageService {
      * @return the updated page
      */
     public Page update(Page page) {
+        Page parent = get(page.getParentId());
+
+        // Removes this Page from the Parent
+        List<SubPage> updatedSubPages = filterParentSubpages(page, parent);
+
+        updatedSubPages.add(new SubPage(page.getId(), page.getName(), page.getPath()));
+
+        parent.setSubpages(updatedSubPages);
+        pageRepository.save(parent);
+
         return pageRepository.save(page);
     }
 
@@ -186,6 +198,15 @@ public class PageService {
         });
 
         // Removes this Page from the Parent
+        List<SubPage> updatedSubPages = filterParentSubpages(page, parent);
+
+        parent.setSubpages(updatedSubPages);
+        pageRepository.save(parent);
+
+        pageRepository.delete(page);
+    }
+
+    private List<SubPage> filterParentSubpages(Page page, Page parent) {
         Iterator<SubPage> iterator = parent.getSubpages().iterator();
         List<SubPage> updatedSubPages = new ArrayList<>();
 
@@ -196,9 +217,6 @@ public class PageService {
             }
         }
 
-        parent.setSubpages(updatedSubPages);
-        update(parent);
-
-        pageRepository.delete(page);
+        return updatedSubPages;
     }
 }

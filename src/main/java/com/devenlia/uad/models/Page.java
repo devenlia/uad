@@ -16,6 +16,7 @@ import java.util.List;
 public class Page {
     @Id
     private String id;
+    private String parentId;
     private String name;
     private String path;
     private List<SubPage> subpages = new ArrayList<>();
