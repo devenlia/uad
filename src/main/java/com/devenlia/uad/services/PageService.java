@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PageService {
@@ -154,15 +155,22 @@ public class PageService {
      * @return the updated page
      */
     public Page update(Page page) {
-        Page parent = get(page.getParentId());
+        Page oldPage = get(page.getId());
 
-        // Removes this Page from the Parent
-        List<SubPage> updatedSubPages = filterParentSubpages(page, parent);
+        if (!Objects.equals(oldPage.getParentId(), page.getParentId())) {
+            // Remove page from old parent
+            Page oldParent = get(oldPage.getParentId());
+            List<SubPage> updatedSubPages = filterParentSubpages(oldPage, oldParent);
+            oldParent.setSubpages(updatedSubPages);
+            pageRepository.save(oldParent);
 
-        updatedSubPages.add(new SubPage(page.getId(), page.getName(), page.getPath()));
-
-        parent.setSubpages(updatedSubPages);
-        pageRepository.save(parent);
+            // Add page to new parent
+            Page parent = get(page.getParentId());
+            List<SubPage> newSubpages = parent.getSubpages();
+            newSubpages.add(new SubPage(page.getId(), page.getName(), page.getPath()));
+            parent.setSubpages(newSubpages);
+            pageRepository.save(parent);
+        }
 
         return pageRepository.save(page);
     }

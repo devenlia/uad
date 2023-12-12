@@ -8,6 +8,8 @@ import com.devenlia.uad.repositories.ContainerRepository;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 public class CategoryService {
 
@@ -31,16 +33,7 @@ public class CategoryService {
             throw new IllegalArgumentException("Invalid category data");
         }
 
-        Container parent;
-        if (category.getParentId() != null && !category.getParentId().isEmpty()) {
-            parent = containerRepository.findById(category.getParentId()).orElse(null);
-            if (parent == null) {
-                throw new IllegalArgumentException("Parent container not found");
-            }
-        }
-        else {
-            throw new IllegalArgumentException("Parent container not defined");
-        }
+        Container parent = getParent(category);
 
         category.getLinks().forEach(link -> {
             link.setParentId(category.getId());
@@ -71,6 +64,19 @@ public class CategoryService {
      * @return the updated category
      */
     public Category update(Category category) {
+        Category oldCategory = get(category.getId());
+
+        if (!Objects.equals(oldCategory.getParentId(), category.getParentId())) {
+            // Remove category from old parent
+            Container oldParent = filterParentCategories(oldCategory);
+            containerRepository.save(oldParent);
+
+            // Add category to new parent
+            Container parent = getParent(category);
+            parent.getCategories().add(category);
+            containerRepository.save(parent);
+        }
+
         return categoryRepository.save(category);
     }
 
@@ -85,6 +91,23 @@ public class CategoryService {
             throw new IllegalArgumentException("Category not found!");
         }
 
+        Container parent = filterParentCategories(category);
+        containerRepository.save(parent);
+
+        category.getLinks().forEach(link -> {
+            linkService.delete(link.getId());
+        });
+        categoryRepository.delete(category);
+    }
+
+    private Container filterParentCategories(Category category) {
+        Container parent = getParent(category);
+
+        parent.getCategories().removeIf(child -> child.getId().equals(category.getId()));
+        return parent;
+    }
+
+    private Container getParent(Category category) {
         Container parent;
         if (category.getParentId() != null && !category.getParentId().isEmpty()) {
             parent = containerRepository.findById(category.getParentId()).orElse(null);
@@ -95,13 +118,6 @@ public class CategoryService {
         else {
             throw new IllegalArgumentException("Parent container not defined");
         }
-
-        parent.getCategories().removeIf(child -> child.getId().equals(category.getId()));
-        containerRepository.save(parent);
-
-        category.getLinks().forEach(link -> {
-            linkService.delete(link.getId());
-        });
-        categoryRepository.delete(category);
+        return parent;
     }
 }

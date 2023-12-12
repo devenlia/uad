@@ -9,6 +9,8 @@ import com.devenlia.uad.repositories.LinkRepository;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 public class LinkService {
 
@@ -41,6 +43,52 @@ public class LinkService {
             throw new IllegalArgumentException("Invalid link data");
         }
 
+        Category parent = getParent(link);
+
+        Link newLink = linkRepository.save(link);
+        parent.getLinks().add(newLink);
+        categoryRepository.save(parent);
+
+        return newLink;
+    }
+
+    public Link update(Link link) {
+        Link oldLink = get(link.getId());
+
+        if (!Objects.equals(oldLink.getParentId(), link.getParentId())) {
+            // Remove category from old parent
+            Category oldParent = filterParentLinks(oldLink);
+            categoryRepository.save(oldParent);
+
+            // Add category to new parent
+            Category parent = getParent(link);
+            parent.getLinks().add(link);
+            categoryRepository.save(parent);
+        }
+
+        return linkRepository.save(link);
+    }
+
+    public void delete(String id) {
+        Link link = get(id);
+        if (link == null) {
+            throw new IllegalArgumentException("Link not found!");
+        }
+
+        Category parent = filterParentLinks(link);
+        categoryRepository.save(parent);
+
+        linkRepository.delete(link);
+    }
+
+    private Category filterParentLinks(Link link) {
+        Category parent = getParent(link);
+
+        parent.getLinks().removeIf(child -> child.getId().equals(link.getId()));
+        return parent;
+    }
+
+    private Category getParent(Link link) {
         Category parent;
         if (link.getParentId() != null && !link.getParentId().isEmpty()) {
             parent = categoryRepository.findById(link.getParentId()).orElse(null);
@@ -51,37 +99,6 @@ public class LinkService {
         else {
             throw new IllegalArgumentException("Parent category not defined");
         }
-
-        Link newLink = linkRepository.save(link);
-        parent.getLinks().add(newLink);
-        categoryRepository.save(parent);
-
-        return newLink;
-    }
-
-    public Link update(Link link) {
-        return linkRepository.save(link);
-    }
-
-    public void delete(String id) {
-        Link link = get(id);
-        if (link == null) {
-            throw new IllegalArgumentException("Link not found!");
-        }
-
-        Category parent;
-        if (link.getParentId() != null && !link.getParentId().isEmpty()) {
-            parent = categoryRepository.findById(link.getParentId()).orElse(null);
-        }
-        else {
-            throw new IllegalArgumentException("Parent container not defined");
-        }
-
-        if (parent != null) {
-            parent.getLinks().removeIf(child -> child.getId().equals(link.getId()));
-            categoryRepository.save(parent);
-        }
-
-        linkRepository.delete(link);
+        return parent;
     }
 }

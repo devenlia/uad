@@ -7,6 +7,8 @@ import com.devenlia.uad.repositories.PageRepository;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 public class ContainerService {
 
@@ -30,16 +32,7 @@ public class ContainerService {
             throw new IllegalArgumentException("Invalid container data");
         }
 
-        Page parent;
-        if (container.getParentId() != null && !container.getParentId().isEmpty()) {
-            parent = pageRepository.findById(container.getParentId()).orElse(null);
-            if (parent == null) {
-                throw new IllegalArgumentException("Parent page not found");
-            }
-        }
-        else {
-            throw new IllegalArgumentException("Parent page not defined");
-        }
+        Page parent = getParent(container);
 
         container.getCategories().forEach(category -> {
             category.setParentId(container.getId());
@@ -71,9 +64,21 @@ public class ContainerService {
      * @return the updated container
      */
     public Container update(Container container) {
+        Container oldContainer = get(container.getId());
+
+        if (!Objects.equals(oldContainer.getParentId(), container.getParentId())) {
+            // Remove container from old parent
+            Page oldParent = filterParentContainers(oldContainer);
+            pageRepository.save(oldParent);
+
+            // Add container to new parent
+            Page parent = filterParentContainers(container);
+            parent.getContainers().add(container);
+            pageRepository.save(parent);
+        }
+
         return containerRepository.save(container);
     }
-
 
     /**
      * Deletes a container from the database.
@@ -86,6 +91,23 @@ public class ContainerService {
             throw new IllegalArgumentException("Container not found!");
         }
 
+        Page parent = filterParentContainers(container);
+        pageRepository.save(parent);
+
+        container.getCategories().forEach(category -> {
+            categoryService.delete(category.getId());
+        });
+        containerRepository.delete(container);
+    }
+
+    private Page filterParentContainers(Container container) {
+        Page parent = getParent(container);
+
+        parent.getContainers().removeIf(child -> child.getId().equals(container.getId()));
+        return parent;
+    }
+
+    private Page getParent(Container container) {
         Page parent;
         if (container.getParentId() != null && !container.getParentId().isEmpty()) {
             parent = pageRepository.findById(container.getParentId()).orElse(null);
@@ -96,13 +118,6 @@ public class ContainerService {
         else {
             throw new IllegalArgumentException("Parent page not defined");
         }
-
-        parent.getContainers().removeIf(child -> child.getId().equals(container.getId()));
-        pageRepository.save(parent);
-
-        container.getCategories().forEach(category -> {
-            categoryService.delete(category.getId());
-        });
-        containerRepository.delete(container);
+        return parent;
     }
 }
