@@ -1,5 +1,11 @@
 # Release Notes
 
+## Version 1.2.4
+
+### New Features and Enhancements
+- Introduced a method to support the imminent edit-mode for all content elements.
+
+
 ## Version 1.2.3
 
 ### New Features and Enhancements
