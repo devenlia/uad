@@ -19,6 +19,5 @@ COPY --from=layers /layer/snapshot-dependencies/ ./
 COPY --from=layers /layer/application/ ./
 RUN chown -R uadapp:uadapp /opt
 USER uadapp
-HEALTHCHECK --interval=30s --timeout=3s --retries=1 CMD wget -qO- http://localhost:8080/actuator/health/ | grep UP || exit 1
 EXPOSE 8080
 ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher", "--spring.profiles.active=prod"]
